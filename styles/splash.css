@@ -1,0 +1,25 @@
+#container, #canvas {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+#copyrightAnchor {
+  opacity: 0;
+}
+.letter {
+  fill: slategrey;
+  font-size: 0.8rem;
+  opacity: 0;
+  text-anchor: middle;
+}
+#narrative {
+  display: none;
+  color: darkslategrey;
+  font-family: "ABCSans Black", "Arial Black", sans-serif;
+  text-shadow: .1rem .2rem .2rem silver;
+  opacity: 0;
+}
+#narrative.inverse {
+  display: block;
+
+}

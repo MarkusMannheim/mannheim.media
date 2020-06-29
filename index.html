@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<head>
+  <!-- Google analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117117841-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-117117841-1');
+  </script>
+
+  <meta charset="utf-8">
+
+  <!-- Page data for scrapers -->
+  <title>Markus Mannheim | data journalism</title>
+  <meta name="description" content="Australian journalist who specialises in data visualisation and analysis.">
+  <meta name="keywords" content="markus, mannheim, data, journalist, visualisation, dataviz, coder, act, canberra, australia">
+  <meta name="author" content="Markus Mannheim">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="Markus Mannheim | journalist and coder in Canberra">
+  <meta property="og:description" content="Australian journalist who specialises in data visualisation and analysis.">
+  <meta property="og:image" content="https://mannheim.media/media/mmLogoOg.jpg">
+  <meta property="og:url" content="https://mannheim.media/index.html">
+  <meta property="og:type" content="website">
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:site" content="@MarkusMannheim">
+  <meta property="twitter:creator" content="@MarkusMannheim">
+
+  <!-- stylesheets etc -->
+  <link href="./styles/default.css" rel="stylesheet">
+  <link href="./styles/splash.css" rel="stylesheet">
+  <link href="./media/mmLogo64.png" rel="icon">
+
+  <!-- Initial scripts -->
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/topojson.v3.min.js"></script>
+  <script src="./tools/pageSetup.js"></script>
+</head>
+<body>
+  <script>
+    page = "home";
+    pageSetup();
+    splashTime = 1250;
+
+    // set up splash
+    canvas = container
+      .append("svg")
+        .attr("id", "canvas");
+    logoGradient = canvas
+      .append("defs")
+        .append("linearGradient")
+          .attr("id", "logoGradient");
+    canvasGroup = canvas
+      .append("g")
+        .attr("id", "canvasGroup");
+    narrative = contactScreen
+      .append("div")
+        .attr("id", "narrative");
+    resizeSplash();
+
+    // load splash data sources
+    d3.queue()
+      .defer(d3.json, "./data/worldLand110m.topojson")
+      .awaitAll(function(error, data) {
+        if (error) throw error;
+        // set up planet
+        // planetData = topojson.feature(data[0], data[0].objects.tracts);
+        // projection = d3.geoOrthographic();
+        // currentScale = projection.scale(),
+        // path = d3.geoPath()
+        //   .projection(projection),
+        // city = "Canberra";
+
+        window.addEventListener("resize", resizeSplash);
+
+        // sequence
+        d3.timeout(letterSplash, 0);
+        d3.timeout(planetSplash, splashTime * 7);
+        narrativeZoom("from chaos", 0);
+        narrativeZoom("meaning", 6);
+
+      });
+
+    // narrative
+    function narrativeZoom(text, delay) {
+      d3.timeout(function() {
+        narrative.classed("inverse", true)
+          .text(text)
+          .style("font-size", "3rem")
+        .transition()
+          .duration(splashTime * 2)
+          .ease(d3.easeLinear)
+          .style("opacity", 1)
+          .style("font-size", "2.5rem")
+        .transition()
+          .duration(splashTime * 2)
+          .ease(d3.easeLinear)
+          .style("opacity", 0)
+          .style("font-size", "2rem");
+        d3.timeout(function() {
+          narrative.classed("inverse", false);
+        }, splashTime * 4);
+      }, splashTime * delay);
+    }
+
+    // page resizing function
+    function resizeSplash() {
+      canvasWidth = window.innerWidth;
+      canvasHeight = window.innerHeight;
+      canvasCentre = [canvasWidth / 2, canvasHeight / 2];
+      canvasMax = canvasWidth > canvasHeight ? canvasHeight : canvasWidth;
+      gridX = Math.floor((canvasWidth) / 30) + 1;
+      gridDx = canvasWidth % 30 / 2;
+      gridY = Math.floor((canvasHeight) / 30) + 1;
+      gridDy = canvasHeight % 30 / 2;
+      // projection.fitExtent([], {type: "Sphere"})
+      //   .translate([canvasWidth / 2, canvasHeight / 2]);
+    }
+
+    // letter splash
+    function letterSplash() {
+      // unicode characters
+      letterSet = [
+        "\u0021", "\u0022", "\u0023", "\u0024", "\u0025", "\u0026", "\u0027", "\u0028", "\u0029", "\u002A", "\u002B", "\u002C", "\u002D", "\u002E", "\u002F", "\u0030", "\u0031", "\u0032", "\u0033", "\u0034", "\u0035", "\u0036", "\u0037", "\u0038", "\u0039", "\u003A", "\u003B", "\u003C", "\u003D", "\u003E", "\u003F", "\u0040", "\u0041", "\u0042", "\u0043", "\u0044", "\u0045", "\u0046", "\u0047", "\u0048", "\u0049", "\u004A", "\u004B", "\u004C", "\u004D", "\u004E", "\u004F", "\u0050", "\u0051", "\u0052", "\u0053", "\u0054", "\u0055", "\u0056", "\u0057", "\u0058", "\u0059", "\u005A", "\u005B", "\u005C", "\u005D", "\u005E", "\u005F", "\u0060", "\u0061", "\u0062", "\u0063", "\u0064", "\u0065", "\u0066", "\u0067", "\u0068", "\u0069", "\u006A", "\u006B", "\u006C", "\u006D", "\u006E", "\u006F", "\u0070", "\u0071", "\u0072", "\u0073", "\u0074", "\u0075", "\u0076", "\u0077", "\u0078", "\u0079", "\u007A", "\u007B", "\u007C", "\u007D", "\u007E"];
+      // establish random data
+      letterData = d3.range(gridX * gridY)
+        .map(function(d, i) {
+          return {
+            x: d3.randomNormal(0, canvasMax / 8)(),
+            y: d3.randomNormal(0, canvasMax / 8)(),
+            z: d3.randomUniform(0, 359)(),
+            i: i,
+            mark: Math.floor(d3.randomUniform(0,10)()),
+            char: letterSet[Math.floor(d3.randomUniform(0, 94)())]
+          };
+        });
+      d3.shuffle(letterData);
+
+      // begin letter splash
+      letters = canvasGroup
+        .selectAll(".letter")
+          .data(letterData)
+        .enter().append("text")
+          .classed("letter", true)
+          .text(function(d) { return d.char; })
+          .attr("transform", function(d) { return "translate(" + (canvasCentre[0] + d.x * 3) + ", " + (canvasCentre[1] + d.y * 3) + ") rotate(" + d3.randomUniform(0, 360)() + ")"; });
+
+      // randomised normal distribution
+      letters.transition()
+        .duration(splashTime)
+        .delay(function(d, i) { return i * splashTime / letterData.length + splashTime; })
+        .style("opacity", 1)
+        .attr("transform", function(d) { return "translate(" + (canvasCentre[0] + d.x) + ", " + (canvasCentre[1] + d.y) + ") rotate(" + d.z + ")"; })
+
+      // sort into grid
+      .transition()
+        .delay(splashTime * 2)
+        .attr("transform", function(d) { return "translate(" + letterCoordinates(d.i)[0] + ", " + letterCoordinates(d.i)[1] + ") rotate(" + d.z + ")"; })
+      // correct rotation
+      .transition()
+        .duration(splashTime)
+        .attr("transform", function(d) { return "translate(" + letterCoordinates(d.i)[0] + ", " + letterCoordinates(d.i)[1] + ") rotate(0)"; })
+
+      // colorise filtered data
+      .transition()
+        .duration(splashTime * 2)
+        .style("font-family", function(d) { return d.mark < 7 ? "ABCSans Regular" : "ABCSans Black"; })
+        .style("fill", function(d) { return d.mark < 7 ? slate : d.mark == 8 ? blue : d.mark == 9 ? green : orange; });
+
+      // determines grid location
+      function letterCoordinates(i) {
+        let column = i % gridX;
+        let row = Math.floor(i / gridX);
+        return [column * 30 + gridDx, row * 30 + gridDy];
+      }
+    }
+
+    // planet splash
+    function planetSplash() {
+      // discard unfiltered letters
+      letters.filter(function(d) {
+          return d.mark < 7;
+        }).transition()
+            .delay(function(d, i) { return i * splashTime / letterData.length; })
+            .duration(splashTime)
+            .attr("transform", function(d) { return "translate(" + (canvasCentre[0] + d.x * 6) + ", " + (canvasCentre[1] + d.y * 6) + ") rotate(" + d3.randomUniform(0, 360)() + ")"; })
+            .style("opacity", 0)
+          .remove();
+
+      // move filtered letters to centre
+      letters.filter(function(d) {
+          return d.mark > 6;
+        }).transition()
+            .delay(function(d, i) { return i * 2 * splashTime / letterData.length + splashTime; })
+            .duration(splashTime)
+            .attr("transform", function(d) { return "translate(" + canvasCentre[0] + ", " + canvasCentre[1] + ") rotate(" + d3.randomUniform(0, 360)() + ")"; })
+            .style("opacity", 0)
+          .remove();
+
+    }
+
+  </script>
+</body>
